@@ -1,0 +1,18 @@
+{
+  "id": "perplexity",
+  "displayName": "Perplexity",
+  "confidence": "medium — based on secondary reporting of Perplexity's official Sonar prompt guide, not independently re-fetched during this build session",
+  "guidance": [
+    "Put the actual information need in direct, specific, query-like language rather than burying it under scene-setting or role-play.",
+    "Keep any role/persona framing minimal — Perplexity's documented architecture runs its web-search step using only the user message, and the system prompt is only applied at answer-generation time after search results are already retrieved, so persona framing cannot shape what gets searched."
+  ],
+  "avoid": [
+    "Elaborate persona/role-play framing — it doesn't influence retrieval and mostly wastes words here.",
+    "Claiming the generated prompt itself can control search parameters (domain filters, recency, etc.) — those are API-level settings, not something prompt text can set, and the generated prompt must never imply otherwise."
+  ],
+  "importantLimitation": "This adapter only writes prompt text for the answer-generation step. It has no ability to configure retrieval/search parameters, and must not pretend otherwise.",
+  "sources": [
+    "https://docs.perplexity.ai/docs/sonar/prompt-guide"
+  ],
+  "lastVerified": "2026-09-07"
+}

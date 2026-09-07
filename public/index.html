@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Prompt Architect</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <span class="logo-mark">◆</span>
+      <span class="logo-text">Prompt Architect</span>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <!-- SCREEN 1: INPUT -->
+    <section id="screen-input" class="screen">
+      <h1>What do you want AI to help you do?</h1>
+      <p class="subtitle">Describe it roughly. Prompt Architect figures out the hard part.</p>
+
+      <textarea id="request-input" rows="5" maxlength="4000"
+        placeholder="e.g. Help me market my plumbing business"></textarea>
+
+      <div class="controls-grid">
+        <label class="control">
+          <span>Model</span>
+          <select id="model-select"></select>
+        </label>
+
+        <label class="control">
+          <span>Interview</span>
+          <select id="mode-select">
+            <option value="fast" selected>Fast</option>
+            <option value="deep">Deep</option>
+          </select>
+        </label>
+
+        <label class="control">
+          <span>Prompt level</span>
+          <select id="level-select">
+            <option value="auto" selected>Auto (recommended)</option>
+            <option value="quick">Quick</option>
+            <option value="super">Super</option>
+            <option value="expert">Expert</option>
+          </select>
+        </label>
+      </div>
+
+      <button id="generate-btn" class="btn-primary">Generate</button>
+      <p id="input-error" class="error-text" hidden></p>
+    </section>
+
+    <!-- SCREEN 2: QUESTIONS -->
+    <section id="screen-questions" class="screen" hidden>
+      <h1>A couple of quick questions</h1>
+      <p class="subtitle">Skip any of these — Prompt Architect will use a sensible default.</p>
+      <div id="questions-list"></div>
+      <button id="continue-btn" class="btn-primary">Continue</button>
+      <button id="back-btn" class="btn-text">← Back</button>
+    </section>
+
+    <!-- LOADING -->
+    <section id="screen-loading" class="screen" hidden>
+      <div class="loading-box">
+        <div class="spinner"></div>
+        <p id="loading-status">Understanding your goal…</p>
+      </div>
+    </section>
+
+    <!-- SCREEN 3: RESULT -->
+    <section id="screen-result" class="screen" hidden>
+      <h1>Your Prompt</h1>
+      <div class="prompt-box">
+        <pre id="prompt-text"></pre>
+        <button id="copy-btn" class="btn-secondary">Copy Prompt</button>
+      </div>
+
+      <div class="result-card">
+        <h2>Why This Prompt Works</h2>
+        <ul id="explanation-list" class="explanation-list"></ul>
+      </div>
+
+      <div class="result-card">
+        <h2>Prompt Score</h2>
+        <div class="score-header">
+          <span id="score-overall" class="score-overall">—</span>
+          <span id="score-limiting" class="score-limiting"></span>
+        </div>
+        <div id="score-categories" class="score-categories"></div>
+        <p id="score-rationale" class="score-rationale"></p>
+      </div>
+
+      <div class="result-card">
+        <h2>Details</h2>
+        <p><strong>Optimized for:</strong> <span id="detail-model"></span></p>
+        <p><strong>Level used:</strong> <span id="detail-level"></span></p>
+        <p><strong>Components used:</strong></p>
+        <div id="detail-components" class="chip-list"></div>
+        <details id="detail-more">
+          <summary>What was improved during refinement</summary>
+          <ul id="detail-refinements"></ul>
+          <p class="detail-subhead">Removed as unnecessary</p>
+          <ul id="detail-bloat"></ul>
+          <p class="detail-subhead">Assumptions made</p>
+          <ul id="detail-assumptions"></ul>
+        </details>
+      </div>
+
+      <div class="result-actions">
+        <button id="simpler-btn" class="btn-secondary">Make It Simpler</button>
+        <button id="stronger-btn" class="btn-secondary">Make It Stronger</button>
+        <button id="start-over-btn" class="btn-text">Start over</button>
+      </div>
+      <p id="result-error" class="error-text" hidden></p>
+    </section>
+
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>

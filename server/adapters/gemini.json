@@ -1,0 +1,19 @@
+{
+  "id": "gemini",
+  "displayName": "Gemini",
+  "confidence": "medium — based on secondary reporting of Google's official Gemini prompting-strategies guide, not independently re-fetched during this build session",
+  "guidance": [
+    "Keep few-shot examples few and structurally identical to one another (same tags, whitespace, structure) — Gemini is documented as sensitive to formatting drift between examples, and overfitting to too many examples is a documented risk.",
+    "Phrase constraints as the desired end-state rather than as a prohibition ('write in a warm, casual tone' rather than 'don't be too formal') — documented to work better than negative/pressure framing.",
+    "For long reference material, place instructions/questions after the material, anchored with phrasing like 'Based on the preceding information...'.",
+    "State the desired tone/verbosity explicitly rather than assuming a conversational default."
+  ],
+  "avoid": [
+    "Large or structurally inconsistent few-shot example sets.",
+    "Negative or prohibitive phrasing where a positive end-state statement would do the same job."
+  ],
+  "sources": [
+    "https://ai.google.dev/gemini-api/docs/prompting-strategies"
+  ],
+  "lastVerified": "2026-09-07"
+}

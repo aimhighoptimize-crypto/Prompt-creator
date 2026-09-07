@@ -1,0 +1,16 @@
+{
+  "name": "prompt-architect",
+  "version": "1.0.0",
+  "description": "Turns a rough request into a precise, model-optimized AI prompt.",
+  "type": "module",
+  "private": true,
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.124.0",
+    "express": "^4.21.2",
+    "zod": "^3.25.0"
+  }
+}

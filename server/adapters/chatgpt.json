@@ -1,0 +1,19 @@
+{
+  "id": "chatgpt",
+  "displayName": "ChatGPT",
+  "confidence": "medium-high — based on OpenAI's official GPT-5 prompting guide (cookbook.openai.com), not independently re-fetched during this build session",
+  "guidance": [
+    "State desired formatting (e.g. Markdown headers/lists) explicitly — it is documented as not applied automatically the way it might be assumed.",
+    "Prefer a short, direct one-line role statement over an elaborate persona.",
+    "For machine-readable output, describe the exact structure directly and plainly rather than through elaborate prose formatting instructions.",
+    "Run an extra internal consistency check across the whole draft before finalizing: this model family is documented as unusually sensitive to contradictory instructions, so a stray leftover requirement causes more damage here than on other models."
+  ],
+  "avoid": [
+    "Leaving in any contradictory or leftover instruction from an earlier draft — treat consistency-checking as higher priority for this adapter than for the others.",
+    "Assuming a particular output format will be used without asking for it directly."
+  ],
+  "sources": [
+    "https://cookbook.openai.com/examples/gpt-5/gpt-5_prompting_guide"
+  ],
+  "lastVerified": "2026-09-07"
+}

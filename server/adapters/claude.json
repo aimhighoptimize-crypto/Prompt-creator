@@ -1,0 +1,22 @@
+{
+  "id": "claude",
+  "displayName": "Claude",
+  "confidence": "high — verified directly against current Anthropic documentation and the Claude API reference",
+  "guidance": [
+    "Use XML-style section tags (e.g. <context>, <instructions>, <example>) once a prompt has three or more distinct parts. Short, single-idea prompts don't need them.",
+    "When examples are used, keep to 3-5, each wrapped consistently (e.g. in <example> tags).",
+    "For long reference material, place the material before the instructions/question, not after — this ordering is documented to improve response quality.",
+    "A short, direct one-line role statement is enough when a role is genuinely warranted. An elaborate persona backstory adds no measurable value.",
+    "For agentic or multi-step tasks, distinguish clearly between what the model should just DO versus what it should only SUGGEST or ask about first."
+  ],
+  "avoid": [
+    "Adding 'think step by step', 'take your time', or similar reasoning-scaffolding instructions — current Claude models reason adaptively by default, so this is redundant token spend, not a quality lever.",
+    "Adding an explicit self-verification / 'double-check your work' instruction — current Claude models already do this unprompted; adding it is redundant.",
+    "Aggressive 'CRITICAL: you MUST' style tool-triggering language — documented to cause over-triggering.",
+    "Prefilled or forced-continuation-style instructions."
+  ],
+  "sources": [
+    "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices"
+  ],
+  "lastVerified": "2026-09-07"
+}

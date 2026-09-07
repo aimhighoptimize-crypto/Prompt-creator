@@ -1,0 +1,18 @@
+{
+  "id": "grok",
+  "displayName": "Grok",
+  "confidence": "medium — based on xAI's public production system-prompt repository and secondary reporting of its prompting guidance, not independently re-fetched during this build session",
+  "guidance": [
+    "Use XML tags or Markdown headers to delineate a multi-part prompt.",
+    "Favor concrete, specific requests over vague or abstract ones.",
+    "Mention Grok's native real-time access to X posts and live web search only when the task genuinely benefits from current-events or social-signal awareness — this is Grok's actual documented differentiator, not a generic capability to claim by default."
+  ],
+  "avoid": [
+    "Vague or abstract phrasing where a concrete instruction would do.",
+    "Claiming real-time-data awareness matters for a task that has nothing to do with current events or live information."
+  ],
+  "sources": [
+    "https://github.com/xai-org/grok-prompts"
+  ],
+  "lastVerified": "2026-09-07"
+}
