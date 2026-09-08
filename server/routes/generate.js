@@ -1,7 +1,9 @@
 import { Router } from "express";
+import { randomUUID } from "crypto";
 import { runGenerate } from "../pipeline/generate.js";
 import { validateGenerateInput } from "../pipeline/validate.js";
 import { checkPassword } from "../pipeline/auth.js";
+import { createLocalJob, runLocalJob } from "../pipeline/localJobs.js";
 
 const router = Router();
 
@@ -15,13 +17,10 @@ router.post("/", async (req, res) => {
     return res.status(400).json({ error });
   }
 
-  try {
-    const result = await runGenerate(value);
-    res.json(result);
-  } catch (err) {
-    console.error("generate error:", err);
-    res.status(502).json({ error: "Prompt Architect couldn't generate a prompt right now. Please try again." });
-  }
+  const jobId = randomUUID();
+  createLocalJob(jobId);
+  runLocalJob(jobId, runGenerate(value));
+  res.status(202).json({ jobId });
 });
 
 export default router;

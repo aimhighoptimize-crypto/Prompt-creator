@@ -184,11 +184,41 @@ document.getElementById("continue-btn").addEventListener("click", async () => {
   await doGenerate();
 });
 
+const UNAUTHORIZED = Symbol("unauthorized");
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// Generation can take well over a minute. Rather than one long request
+// (which serverless hosting can't reliably keep open that long), this
+// starts a job and polls for its result — works the same locally and when
+// deployed.
+async function pollForResult(jobId) {
+  const POLL_INTERVAL_MS = 2500;
+  const MAX_WAIT_MS = 3 * 60 * 1000;
+  const startedAt = Date.now();
+
+  while (Date.now() - startedAt < MAX_WAIT_MS) {
+    await sleep(POLL_INTERVAL_MS);
+    const res = await fetch(`/api/generate-status?jobId=${encodeURIComponent(jobId)}`, {
+      headers: authHeaders(),
+    });
+    if (res.status === 401) return UNAUTHORIZED;
+    if (!res.ok) throw new Error((await res.json()).error || "Request failed");
+    const job = await res.json();
+    if (job.status === "done") return job.result;
+    if (job.status === "error") throw new Error(job.error || "Generation failed.");
+    // else "pending" — keep polling
+  }
+  throw new Error("This is taking longer than expected. Please try again.");
+}
+
 async function doGenerate(regenerate) {
   startLoading();
   resultError.hidden = true;
   try {
-    const res = await fetch("/api/generate", {
+    const startRes = await fetch("/api/generate", {
       method: "POST",
       headers: { "Content-Type": "application/json", ...authHeaders() },
       body: JSON.stringify({
@@ -201,9 +231,13 @@ async function doGenerate(regenerate) {
         regenerate,
       }),
     });
-    if (res.status === 401) return handleUnauthorized();
-    if (!res.ok) throw new Error((await res.json()).error || "Request failed");
-    const result = await res.json();
+    if (startRes.status === 401) return handleUnauthorized();
+    if (!startRes.ok) throw new Error((await startRes.json()).error || "Request failed");
+    const { jobId } = await startRes.json();
+
+    const result = await pollForResult(jobId);
+    if (result === UNAUTHORIZED) return handleUnauthorized();
+
     state.lastResult = result;
     stopLoading();
     renderResult(result);

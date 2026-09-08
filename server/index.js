@@ -3,6 +3,7 @@ import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import interviewRoute from "./routes/interview.js";
 import generateRoute from "./routes/generate.js";
+import generateStatusRoute from "./routes/generateStatus.js";
 import { listAdapters } from "./adapters/index.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -17,6 +18,7 @@ app.get("/api/models", (req, res) => {
 
 app.use("/api/interview", interviewRoute);
 app.use("/api/generate", generateRoute);
+app.use("/api/generate-status", generateStatusRoute);
 
 app.use(express.static(join(__dirname, "..", "public")));
 
