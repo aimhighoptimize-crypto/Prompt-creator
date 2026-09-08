@@ -1,19 +1,23 @@
-import { readFileSync } from "fs";
-import { fileURLToPath } from "url";
-import { dirname, join } from "path";
+// Static imports (not fs.readFileSync with a dynamic path) so serverless
+// bundlers — Netlify's included — can see these files and package them with
+// the function. A dynamic readFileSync path is invisible to that kind of
+// static analysis and gets silently dropped from the deploy bundle.
+import claude from "./claude.json" with { type: "json" };
+import chatgpt from "./chatgpt.json" with { type: "json" };
+import gemini from "./gemini.json" with { type: "json" };
+import perplexity from "./perplexity.json" with { type: "json" };
+import grok from "./grok.json" with { type: "json" };
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-
-const ADAPTER_IDS = ["claude", "chatgpt", "gemini", "perplexity", "grok"];
-
-const adapters = new Map();
-for (const id of ADAPTER_IDS) {
-  const raw = readFileSync(join(__dirname, `${id}.json`), "utf-8");
-  adapters.set(id, JSON.parse(raw));
-}
+const adapters = new Map([
+  ["claude", claude],
+  ["chatgpt", chatgpt],
+  ["gemini", gemini],
+  ["perplexity", perplexity],
+  ["grok", grok],
+]);
 
 export function listAdapters() {
-  return ADAPTER_IDS.map((id) => ({ id, displayName: adapters.get(id).displayName }));
+  return [...adapters.entries()].map(([id, adapter]) => ({ id, displayName: adapter.displayName }));
 }
 
 export function getAdapter(id) {
