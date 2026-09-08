@@ -1,9 +1,24 @@
 const screens = {
+  lock: document.getElementById("screen-lock"),
   input: document.getElementById("screen-input"),
   questions: document.getElementById("screen-questions"),
   loading: document.getElementById("screen-loading"),
   result: document.getElementById("screen-result"),
 };
+
+const PASSWORD_STORAGE_KEY = "prompt-architect-password";
+
+function getStoredPassword() {
+  try {
+    return localStorage.getItem(PASSWORD_STORAGE_KEY) || "";
+  } catch {
+    return "";
+  }
+}
+
+function authHeaders() {
+  return { "x-app-password": getStoredPassword() };
+}
 
 function showScreen(name) {
   for (const key of Object.keys(screens)) {
@@ -40,7 +55,40 @@ async function loadModels() {
     modelSelect.innerHTML = `<option value="claude">Claude</option>`;
   }
 }
-loadModels();
+
+if (getStoredPassword()) {
+  loadModels();
+  showScreen("input");
+} else {
+  showScreen("lock");
+}
+
+function handleUnauthorized() {
+  stopLoading();
+  try {
+    localStorage.removeItem(PASSWORD_STORAGE_KEY);
+  } catch {
+    // ignore — worst case the wrong password just gets re-sent once more
+  }
+  document.getElementById("password-input").value = "";
+  document.getElementById("lock-error").textContent = "Wrong password — try again.";
+  document.getElementById("lock-error").hidden = false;
+  showScreen("lock");
+}
+
+document.getElementById("unlock-btn").addEventListener("click", () => {
+  const value = document.getElementById("password-input").value;
+  if (!value) return;
+  try {
+    localStorage.setItem(PASSWORD_STORAGE_KEY, value);
+  } catch {
+    // localStorage unavailable — password will just be re-sent from memory
+    // via getStoredPassword() failing gracefully; not worth blocking on.
+  }
+  document.getElementById("lock-error").hidden = true;
+  loadModels();
+  showScreen("input");
+});
 
 const LOADING_STAGES = [
   "Understanding your goal…",
@@ -85,9 +133,10 @@ document.getElementById("generate-btn").addEventListener("click", async () => {
   try {
     const res = await fetch("/api/interview", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...authHeaders() },
       body: JSON.stringify({ request: state.request, targetModel: state.targetModel, mode: state.mode }),
     });
+    if (res.status === 401) return handleUnauthorized();
     if (!res.ok) throw new Error((await res.json()).error || "Request failed");
     const interview = await res.json();
     state.interview = interview;
@@ -141,7 +190,7 @@ async function doGenerate(regenerate) {
   try {
     const res = await fetch("/api/generate", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...authHeaders() },
       body: JSON.stringify({
         request: state.request,
         targetModel: state.targetModel,
@@ -152,6 +201,7 @@ async function doGenerate(regenerate) {
         regenerate,
       }),
     });
+    if (res.status === 401) return handleUnauthorized();
     if (!res.ok) throw new Error((await res.json()).error || "Request failed");
     const result = await res.json();
     state.lastResult = result;

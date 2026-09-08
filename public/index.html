@@ -16,8 +16,17 @@
 
   <main class="wrap">
 
+    <!-- SCREEN 0: LOCK -->
+    <section id="screen-lock" class="screen" hidden>
+      <h1>Enter password</h1>
+      <p class="subtitle">This copy of Prompt Architect is private to you.</p>
+      <input type="password" id="password-input" placeholder="Password" autocomplete="current-password" />
+      <button id="unlock-btn" class="btn-primary" style="margin-top:12px;">Continue</button>
+      <p id="lock-error" class="error-text" hidden></p>
+    </section>
+
     <!-- SCREEN 1: INPUT -->
-    <section id="screen-input" class="screen">
+    <section id="screen-input" class="screen" hidden>
       <h1>What do you want AI to help you do?</h1>
       <p class="subtitle">Describe it roughly. Prompt Architect figures out the hard part.</p>
 
