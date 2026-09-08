@@ -35,3 +35,14 @@ Claude is the engine that does the actual thinking (interpreting the request, se
 components, drafting, critiquing, scoring, explaining) for every target model — the other
 four models are never called directly in V1; Prompt Architect writes prompts for them, it
 doesn't run them.
+
+## Cost
+
+The engine runs on Claude Sonnet 5 at moderate effort, with the shared instruction block
+(rubric, component list, anti-bloat pass — everything that doesn't change per target
+model) marked for prompt caching, since it's identical on every call regardless of which
+model the prompt is being written for. In testing: ~$0.03–0.05 per "generate" call with a
+warm cache (first call after a >5 min gap costs a bit more to write the cache), a few
+seconds to write — the interview call is a cent or less. The server logs actual token
+usage per generate call (`[generate] model=... input=... cache_read=... output=...`) so
+you can watch real cost while using it.

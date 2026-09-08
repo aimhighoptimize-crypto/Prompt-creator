@@ -9,8 +9,11 @@ import {
   LEVEL_DEFINITIONS,
 } from "./rubric.js";
 
-function buildSystemPrompt(adapter) {
-  return `
+// This part is identical on every call regardless of target model — marked
+// cacheable so repeated use (any model) reads it at ~10% of input-token
+// cost instead of paying full price every time. Keep it byte-for-byte
+// stable; any change here invalidates the cache.
+const SHARED_INSTRUCTIONS = `
 You are the generation engine of Prompt Architect. Given a user's rough
 request, you produce a precise, model-optimized prompt for them to use with
 another AI model — you do not answer the request yourself.
@@ -21,6 +24,9 @@ if it scores well on vibes.
 
 Do this work internally, in order, before producing your final answer:
 1. Interpret the user's real underlying goal (not a literal restatement).
+   Do not silently expand scope beyond what was asked (e.g. don't turn a
+   request for one version of something into multiple versions unless the
+   user asked for options).
 2. Decide the prompt level (quick/super/expert) using the definitions below —
    unless the user forced a specific level, in which case use that one and
    explain what changes at that level for this task.
@@ -42,7 +48,9 @@ Do this work internally, in order, before producing your final answer:
    still has a real limitation should not score 95+. Never rubber-stamp with
    uniform high scores — if you can't find a real weakness at this point,
    say so explicitly in limiting_factor rather than defaulting to vague
-   praise.
+   praise. The overall score should actually move when the underlying
+   information quality changes between two otherwise-similar requests — do
+   not anchor it to a fixed comfortable range.
 10. Explain the FINAL prompt in plain English — one line per component
     actually used, written about what THIS prompt specifically does, never a
     generic definition of what that kind of component usually does.
@@ -58,7 +66,10 @@ ${COMPONENT_LIST}
 
 === ANTI-BLOAT PASS ===
 ${ANTI_BLOAT_TEST}
+`.trim();
 
+function buildAdapterSystemBlock(adapter) {
+  return `
 === TARGET MODEL: ${adapter.displayName} (adapter confidence: ${adapter.confidence}) ===
 Guidance to apply:
 ${adapter.guidance.map((g) => `- ${g}`).join("\n")}
@@ -126,10 +137,13 @@ export async function runGenerate({
     model: ENGINE_MODEL,
     max_tokens: 16000,
     output_config: {
-      effort: "high",
+      effort: "medium",
       format: zodOutputFormat(GenerateSchema),
     },
-    system: buildSystemPrompt(adapter),
+    system: [
+      { type: "text", text: SHARED_INSTRUCTIONS, cache_control: { type: "ephemeral" } },
+      { type: "text", text: buildAdapterSystemBlock(adapter) },
+    ],
     messages: [
       {
         role: "user",
@@ -141,6 +155,11 @@ export async function runGenerate({
   if (!response.parsed_output) {
     throw new Error("Generation stage failed to produce a structured result.");
   }
+
+  const u = response.usage;
+  console.log(
+    `[generate] model=${ENGINE_MODEL} input=${u.input_tokens} cache_read=${u.cache_read_input_tokens} cache_write=${u.cache_creation_input_tokens} output=${u.output_tokens}`
+  );
 
   return response.parsed_output;
 }
